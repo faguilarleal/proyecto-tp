@@ -21,15 +21,20 @@ P = np.array([[1,0, 0,  0,  0,  0,  0,  0 ],
 
 P2 = np.linalg.matrix_power(P,2)
 
+t = 0
 prob_menganita = 0
 prob_chispudito = 0
 for i in range(8):
     for j in range(8):
+        t += P2[i][j]
         if j == 0:
             prob_menganita += P2[i][j]
         if j == 6:
             prob_chispudito += P2[i][j]
 
-print(f"Probabilidad de que gane Menganita: {prob_menganita/8}")
-print(f"Probabilidad de que gane Chispudito: {prob_chispudito/8}")
+total = ((prob_chispudito + prob_menganita))
+print(t, total)
+
+print(f"Probabilidad de que gane Menganita: {(prob_menganita/8)*t/total}")
+print(f"Probabilidad de que gane Chispudito: {(prob_chispudito/8)*t/total}")
 
