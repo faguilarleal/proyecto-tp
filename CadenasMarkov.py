@@ -1,35 +1,40 @@
-# Menganita y Chispudito juegan con una moneda balanceada (no cargada). El juego consiste en que cada uno escoge una combinación de caras y cruces de largo 3 y empiezan a tirar la moneda. 
-# La primera persona que obtenga su combinación al tirar la moneda gana (la moneda se tira hasta que alguno de los dos gane). 
-# Menganita selecciona CCC, mientras que Chispudito selecciona XCX. 
-  
-# Para ayudarle a Menganita, debe calcular la probabilidad de que cada uno de ellos gane.
 import numpy as np
-# Definimos la matriz de transición
-P = np.array([[1,0, 0,  0,  0,  0,  0,  0 ],
-            [0.5, 0, 0,  0,  0.5, 0,  0,  0 ],
-            [0, 0,  0,  0.5, 0,  0,  0,  0.5],
-            [0, 0.5, 0,  0,  0,  0,  0.5, 0 ],
-            [0, 0,  0.5, 0,  0.5,  0, 0,  0 ],
-            [0, 0.5, 0,  0,  0,  0,  0.5, 0 ],
-            [0, 0,  0,  0,  0,  0,  1,  0, ],
-            [0, 0,  0,  0.5, 0,  0,  0,  0.5]])
 
-P2 = np.linalg.matrix_power(P,2)
+# Define the states for easy reference
+states = ["HHH", "THT", "Start", "H","T", "HH", "TH"]
 
-t = 0
-prob_menganita = 0
-prob_chispudito = 0
-for i in range(8):
-    for j in range(8):
-        t += P2[i][j]
-        if j == 0:
-            prob_menganita += P2[i][j]
-        if j == 6:
-            prob_chispudito += P2[i][j]
+# Initialize the transition matrix
+P = np.array([
+    [1, 0, 0, 0, 0, 0, 0],
+    [0, 1, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0.5, 0.5, 0, 0],
+    [0, 0, 0, 0, 0.5, 0.5, 0],
+    [0, 0, 0, 0, 0.5, 0, 0.5],
+    [0.5, 0, 0, 0, 0.5, 0, 0],
+    [0, 0.5, 0, 0, 0, 0.5, 0]
+])
 
-total = ((prob_chispudito + prob_menganita))
-print(t, total)
+# Define the indices of the absorbing states
+HHH_index = states.index("HHH")
+THT_index = states.index("THT")
 
-print(f"Probabilidad de que gane Menganita: {(prob_menganita/8)*t/total}")
-print(f"Probabilidad de que gane Chispudito: {(prob_chispudito/8)*t/total}")
+# Define the submatrix Q of non-absorbing states
+non_absorbing_indices = [i for i in range(len(states)) if i not in {HHH_index, THT_index}]
+T = P[np.ix_(non_absorbing_indices, non_absorbing_indices)]
+# Define the submatrix R of transitions to absorbing states
+M = P[np.ix_(non_absorbing_indices, [HHH_index, THT_index])]
+# Identity matrix for the size of Q
+I = np.eye(T.shape[0])
+
+# Fundamental matrix N = (I - Q)^-1
+N = np.linalg.inv(I - T)
+
+# Calculate the absorbing probabilities B = NR
+B = N @ M
+
+P_HHH_first = B[0, 0]
+P_THT_first = B[0, 1]
+
+print(f"Probability of HHH appearing first: {P_HHH_first}")
+print(f"Probability of THT appearing first: {P_THT_first}")
 
