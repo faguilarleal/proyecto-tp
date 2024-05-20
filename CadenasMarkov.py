@@ -1,9 +1,9 @@
 import numpy as np
 
-# Define the states for easy reference
+# Estados 
 states = ["HHH", "THT", "Start", "H","T", "HH", "TH"]
 
-# Initialize the transition matrix
+# Matriz de transición
 P = np.array([
     [1, 0, 0, 0, 0, 0, 0],
     [0, 1, 0, 0, 0, 0, 0],
@@ -14,27 +14,27 @@ P = np.array([
     [0, 0.5, 0, 0, 0, 0.5, 0]
 ])
 
-# Define the indices of the absorbing states
+# Indices de los estados absorbentes
 HHH_index = states.index("HHH")
 THT_index = states.index("THT")
 
-# Define the submatrix Q of non-absorbing states
+# Define la submatriz T de los estados no absorbentes
 non_absorbing_indices = [i for i in range(len(states)) if i not in {HHH_index, THT_index}]
 T = P[np.ix_(non_absorbing_indices, non_absorbing_indices)]
-# Define the submatrix R of transitions to absorbing states
+# Define la matriz M de transición a los estados absorbentes
 M = P[np.ix_(non_absorbing_indices, [HHH_index, THT_index])]
-# Identity matrix for the size of Q
+# Matriz identidad del tamaño de T
 I = np.eye(T.shape[0])
 
-# Fundamental matrix N = (I - Q)^-1
+# Matriz fundamental N = (I - T)^-1
 N = np.linalg.inv(I - T)
 
-# Calculate the absorbing probabilities B = NR
+# Calcula la probabilidades absorbentes B = NM
 B = N @ M
 
 P_HHH_first = B[0, 0]
 P_THT_first = B[0, 1]
 
-print(f"Probability of HHH appearing first: {P_HHH_first}")
-print(f"Probability of THT appearing first: {P_THT_first}")
+print(f"Probabilidad de que Menganita gane: {P_HHH_first}")
+print(f"Probabilidad de que Chispudito gane: {P_THT_first}")
 
